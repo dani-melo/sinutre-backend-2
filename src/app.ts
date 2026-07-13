@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { env } from './config/env';
+import { env } from './config/env.js';
 import { authRoutes } from './routes/auth.routes';
 import { mealsRoutes } from './routes/meals.routes';
 import { foodRouter } from './routes/food.routes';
