@@ -33,6 +33,63 @@ foodRouter.post('/', requireAuth, async (req, res) => {
     fatPer100g,
   } = req.body;
 
+    // Validação do nome
+    if (!name || name.trim() === '') {
+      return res.status(400).json({
+        message: 'O nome do alimento é obrigatório.',
+      });
+    }
+
+    if (name.trim().length < 2) {
+      return res.status(400).json({
+        message: 'O nome deve possuir pelo menos 2 caracteres.',
+      });
+    }
+
+    // Validação das calorias
+    if (
+      caloriesPer100g === undefined ||
+      caloriesPer100g === null ||
+      caloriesPer100g <= 0
+    ) {
+      return res.status(400).json({
+        message: 'As calorias devem ser maiores que zero.',
+      });
+    }
+
+    // Validação dos carboidratos
+    if (
+      carbsPer100g === undefined ||
+      carbsPer100g === null ||
+      carbsPer100g < 0
+    ) {
+      return res.status(400).json({
+        message: 'Carboidratos inválidos.',
+      });
+    }
+
+    // Validação das proteínas
+    if (
+      proteinPer100g === undefined ||
+      proteinPer100g === null ||
+      proteinPer100g < 0
+    ) {
+      return res.status(400).json({
+        message: 'Proteínas inválidas.',
+      });
+    }
+
+    // Validação das gorduras
+    if (
+      fatPer100g === undefined ||
+      fatPer100g === null ||
+      fatPer100g < 0
+    ) {
+      return res.status(400).json({
+        message: 'Gorduras inválidas.',
+      });
+    }
+
   const food = await prisma.food.create({
     data: {
       name,
@@ -58,6 +115,64 @@ foodRouter.put('/:id', requireAuth, async (req, res) => {
     proteinPer100g,
     fatPer100g,
   } = req.body;
+
+
+      // Validação do nome
+    if (!name || name.trim() === '') {
+      return res.status(400).json({
+        message: 'O nome do alimento é obrigatório.',
+      });
+    }
+
+    if (name.trim().length < 2) {
+      return res.status(400).json({
+        message: 'O nome deve possuir pelo menos 2 caracteres.',
+      });
+    }
+
+    // Validação das calorias
+    if (
+      caloriesPer100g === undefined ||
+      caloriesPer100g === null ||
+      caloriesPer100g <= 0
+    ) {
+      return res.status(400).json({
+        message: 'As calorias devem ser maiores que zero.',
+      });
+    }
+
+    // Validação dos carboidratos
+    if (
+      carbsPer100g === undefined ||
+      carbsPer100g === null ||
+      carbsPer100g < 0
+    ) {
+      return res.status(400).json({
+        message: 'Carboidratos inválidos.',
+      });
+    }
+
+    // Validação das proteínas
+    if (
+      proteinPer100g === undefined ||
+      proteinPer100g === null ||
+      proteinPer100g < 0
+    ) {
+      return res.status(400).json({
+        message: 'Proteínas inválidas.',
+      });
+    }
+
+    // Validação das gorduras
+    if (
+      fatPer100g === undefined ||
+      fatPer100g === null ||
+      fatPer100g < 0
+    ) {
+      return res.status(400).json({
+        message: 'Gorduras inválidas.',
+      });
+    }
 
   const foodExists = await prisma.food.findFirst({
     where: {
