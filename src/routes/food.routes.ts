@@ -46,3 +46,77 @@ foodRouter.post('/', requireAuth, async (req, res) => {
 
   return res.status(201).json(food);
 });
+
+
+foodRouter.put('/:id', requireAuth, async (req, res) => {
+  const id = Number(req.params.id);
+
+  const {
+    name,
+    caloriesPer100g,
+    carbsPer100g,
+    proteinPer100g,
+    fatPer100g,
+  } = req.body;
+
+  const foodExists = await prisma.food.findFirst({
+    where: {
+      id,
+      userId: req.userId!,
+    },
+  });
+
+  if (!foodExists) {
+    return res.status(404).json({
+      message: 'Alimento não encontrado',
+    });
+  }
+
+  const food = await prisma.food.update({
+    where: {
+      id,
+    },
+    data: {
+      name,
+      caloriesPer100g,
+      carbsPer100g,
+      proteinPer100g,
+      fatPer100g,
+    },
+  });
+
+  return res.json(food);
+});
+
+foodRouter.delete('/:id', requireAuth, async (req, res) => {
+  const id = Number(req.params.id);
+
+  const foodExists = await prisma.food.findFirst({
+    where: {
+      id,
+      userId: req.userId!,
+    },
+  });
+
+  if (!foodExists) {
+    return res.status(404).json({
+      message: 'Alimento não encontrado',
+    });
+  }
+
+  const mealFoods = await prisma.mealFood.findMany({
+    where: {
+      foodId: id,
+    },
+  });
+
+  console.log("MEAL FOODS:", mealFoods);
+
+  await prisma.food.delete({
+    where: {
+      id,
+    },
+  });
+
+  return res.status(204).send();
+});
