@@ -1,13 +1,22 @@
+# Dependências
 node_modules/
+
+# Compilação
 dist/
+
+# Variáveis de ambiente
 .env
-.env.local
-.env.*.local
-.env.example
+.env.*
+!.env.example
+
+# Logs
 *.log
+
+# Arquivos do sistema
 .DS_Store
-package-lock.json
 
 # SQLite local
 *.db
 *.db-journal
+*.db-wal
+*.db-shm
