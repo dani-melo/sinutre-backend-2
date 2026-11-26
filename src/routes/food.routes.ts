@@ -1,6 +1,8 @@
+import { Prisma } from '@prisma/client';
 import { Router } from 'express';
 import { requireAuth } from '../middlewares/auth.middleware';
 import { prisma } from '../prisma';
+
 
 export const foodRouter = Router();
 
@@ -208,32 +210,67 @@ foodRouter.put('/:id', requireAuth, async (req, res) => {
 foodRouter.delete('/:id', requireAuth, async (req, res) => {
   const id = Number(req.params.id);
 
-  const foodExists = await prisma.food.findFirst({
-    where: {
-      id,
-      userId: req.userId!,
-    },
-  });
-
-  if (!foodExists) {
-    return res.status(404).json({
-      message: 'Alimento não encontrado',
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return res.status(400).json({
+      message: 'Identificador do alimento inválido.',
     });
   }
 
-  const mealFoods = await prisma.mealFood.findMany({
-    where: {
-      foodId: id,
-    },
-  });
+  try {
+    const foodExists = await prisma.food.findFirst({
+      where: {
+        id,
+        userId: req.userId!,
+      },
+    });
 
-  console.log("MEAL FOODS:", mealFoods);
+    if (!foodExists) {
+      return res.status(404).json({
+        message: 'Alimento não encontrado.',
+      });
+    }
 
-  await prisma.food.delete({
-    where: {
-      id,
-    },
-  });
+    const mealFood = await prisma.mealFood.findFirst({
+      where: {
+        foodId: id,
+      },
+    });
 
-  return res.status(204).send();
+    if (mealFood) {
+      return res.status(409).json({
+        message:
+          'Este alimento não pode ser excluído porque está vinculado a uma ou mais refeições.',
+      });
+    }
+
+    await prisma.food.delete({
+      where: {
+        id,
+      },
+    });
+
+    return res.status(204).send();
+
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2003') {
+        return res.status(409).json({
+          message:
+            'Este alimento não pode ser excluído porque está vinculado a uma ou mais refeições.',
+        });
+      }
+
+      if (error.code === 'P2025') {
+        return res.status(404).json({
+          message: 'Alimento não encontrado.',
+        });
+      }
+    }
+
+    console.error('Erro ao excluir alimento:', error);
+
+    return res.status(500).json({
+      message: 'Não foi possível excluir o alimento.',
+    });
+  }
 });
